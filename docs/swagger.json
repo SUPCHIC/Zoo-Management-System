@@ -1,0 +1,188 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Это сервер для управления животными в зоопарке.",
+        "title": "Animal Service API",
+        "contact": {
+            "name": "API Support",
+            "url": "http://example.com/support"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/api",
+    "paths": {
+        "/animals": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "animals"
+                ],
+                "summary": "Получить всех животных",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Animal"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "animals"
+                ],
+                "summary": "Добавить животное",
+                "parameters": [
+                    {
+                        "description": "Animal Data",
+                        "name": "animal",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Animal"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Animal"
+                        }
+                    }
+                }
+            }
+        },
+        "/animals/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "animals"
+                ],
+                "summary": "Получить животное по ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Animal ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Animal"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "animals"
+                ],
+                "summary": "Удалить животное",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Animal ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.Animal": {
+            "type": "object",
+            "properties": {
+                "birthDate": {
+                    "type": "string"
+                },
+                "enclosureID": {
+                    "type": "string"
+                },
+                "favoriteFood": {
+                    "$ref": "#/definitions/model.Food"
+                },
+                "gender": {
+                    "$ref": "#/definitions/model.Gender"
+                },
+                "healthStatus": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "species": {
+                    "$ref": "#/definitions/model.Species"
+                }
+            }
+        },
+        "model.Food": {
+            "type": "object",
+            "properties": {
+                "foodType": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Gender": {
+            "type": "string",
+            "enum": [
+                "male",
+                "female"
+            ],
+            "x-enum-varnames": [
+                "Male",
+                "Female"
+            ]
+        },
+        "model.Species": {
+            "type": "object",
+            "properties": {
+                "animalType": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

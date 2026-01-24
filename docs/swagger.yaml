@@ -1,0 +1,123 @@
+basePath: /api
+definitions:
+  model.Animal:
+    properties:
+      birthDate:
+        type: string
+      enclosureID:
+        type: string
+      favoriteFood:
+        $ref: '#/definitions/model.Food'
+      gender:
+        $ref: '#/definitions/model.Gender'
+      healthStatus:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      species:
+        $ref: '#/definitions/model.Species'
+    type: object
+  model.Food:
+    properties:
+      foodType:
+        type: string
+      name:
+        type: string
+    type: object
+  model.Gender:
+    enum:
+    - male
+    - female
+    type: string
+    x-enum-varnames:
+    - Male
+    - Female
+  model.Species:
+    properties:
+      animalType:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact:
+    name: API Support
+    url: http://example.com/support
+  description: Это сервер для управления животными в зоопарке.
+  title: Animal Service API
+  version: "1.0"
+paths:
+  /animals:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Animal'
+            type: array
+      summary: Получить всех животных
+      tags:
+      - animals
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Animal Data
+        in: body
+        name: animal
+        required: true
+        schema:
+          $ref: '#/definitions/model.Animal'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Animal'
+      summary: Добавить животное
+      tags:
+      - animals
+  /animals/{id}:
+    delete:
+      parameters:
+      - description: Animal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      summary: Удалить животное
+      tags:
+      - animals
+    get:
+      parameters:
+      - description: Animal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Animal'
+      summary: Получить животное по ID
+      tags:
+      - animals
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
