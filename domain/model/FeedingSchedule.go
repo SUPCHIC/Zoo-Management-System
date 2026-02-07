@@ -8,9 +8,9 @@ import (
 )
 
 type FeedingSchedule struct {
-	AnimalID    uuid.UUID
-	FeedingTime time.Time
-	FoodType    FoodType
+	AnimalID    uuid.UUID `json:"animalID"`
+	FeedingTime time.Time `json:"feedingTime"`
+	FoodType    FoodType  `json:"foodType"`
 }
 
 func NewFeedingSchedule(

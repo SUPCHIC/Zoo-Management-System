@@ -1,8 +1,8 @@
 package model
 
 type Species struct {
-	AnimalType AnimalType
-	Name       string
+	AnimalType AnimalType `json:"animalType"`
+	Name       string     `json:"name"`
 }
 
 func NewSpecies(animalType AnimalType, name string) *Species {

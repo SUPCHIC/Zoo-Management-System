@@ -1,15 +1,15 @@
 package model
 
 type Size struct {
-	lenght int
-	width  int
-	height int
+	Lenght int `json:"lenght"`
+	Width  int `json:"width"`
+	Height int `json:"height"`
 }
 
 func NewSize(lenght int, width int, height int) *Size {
 	return &Size{
-		lenght: lenght,
-		width:  width,
-		height: height,
+		Lenght: lenght,
+		Width:  width,
+		Height: height,
 	}
 }

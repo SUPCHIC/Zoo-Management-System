@@ -8,14 +8,14 @@ import (
 )
 
 type Animal struct {
-	ID           uuid.UUID
-	Name         string
-	Species      Species
-	BirthDate    time.Time
-	EnclosureID  uuid.UUID
-	HealthStatus HealthStatus
-	Gender       Gender
-	FavoriteFood Food
+	ID           uuid.UUID    `json:"ID"`
+	Name         string       `json:"name"`
+	Species      Species      `json:"species"`
+	BirthDate    time.Time    `json:"birthDate"`
+	EnclosureID  uuid.UUID    `json:"enclosureID"`
+	HealthStatus HealthStatus `json:"healthStatus"`
+	Gender       Gender       `json:"gender"`
+	FavoriteFood Food         `json:"favoriteFood"`
 }
 
 func NewAnimal(

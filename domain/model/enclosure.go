@@ -7,12 +7,12 @@ import (
 )
 
 type Enclosure struct {
-	AnimalsIDs   []uuid.UUID
-	ID           uuid.UUID
-	Type         AnimalType
-	Size         Size
-	CurrentCount int
-	MaxCapacity  int
+	AnimalsID    []uuid.UUID `json:"animalsID"`
+	ID           uuid.UUID   `json:"ID"`
+	Type         AnimalType  `json:"type"`
+	Size         Size        `json:"size"`
+	CurrentCount int         `json:"currentCount"`
+	MaxCapacity  int         `json:"maxCapacity"`
 }
 
 func NewEnclosure(
@@ -31,19 +31,19 @@ func NewEnclosure(
 		Size:         size,
 		CurrentCount: 0,
 		MaxCapacity:  maxCapacity,
-		AnimalsIDs:   []uuid.UUID{},
+		AnimalsID:    []uuid.UUID{},
 	}
 
 	return enclosure, nil
 }
 
 func (e *Enclosure) AddAnimal(a Animal) {
-	e.AnimalsIDs = append(e.AnimalsIDs, a.ID)
+	e.AnimalsID = append(e.AnimalsID, a.ID)
 }
 func (e *Enclosure) DeleteAnimal(a Animal) {
-	for i, id := range e.AnimalsIDs {
+	for i, id := range e.AnimalsID {
 		if id == a.ID {
-			e.AnimalsIDs = append(e.AnimalsIDs[:i], e.AnimalsIDs[i+1:]...)
+			e.AnimalsID = append(e.AnimalsID[:i], e.AnimalsID[i+1:]...)
 		}
 	}
 }

@@ -8,20 +8,17 @@ import (
 	"github.com/google/uuid"
 )
 
-// InMemoryEnclosureRepository - репозиторий вольеров в памяти
 type InMemoryEnclosureRepository struct {
 	mu         sync.RWMutex
 	enclosures map[uuid.UUID]model.Enclosure
 }
 
-// NewInMemoryEnclosureRepository - конструктор
 func NewInMemoryEnclosureRepository() *InMemoryEnclosureRepository {
 	return &InMemoryEnclosureRepository{
 		enclosures: make(map[uuid.UUID]model.Enclosure),
 	}
 }
 
-// Save - сохраняет вольер
 func (r *InMemoryEnclosureRepository) Save(enclosure model.Enclosure) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -30,7 +27,6 @@ func (r *InMemoryEnclosureRepository) Save(enclosure model.Enclosure) error {
 	return nil
 }
 
-// FindByID - ищет вольер по ID
 func (r *InMemoryEnclosureRepository) FindByID(id uuid.UUID) (*model.Enclosure, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()

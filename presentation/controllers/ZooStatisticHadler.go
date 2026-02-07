@@ -149,7 +149,7 @@ func (h *ZooStatisticsHandler) GetAnimalsInEnclosure(w http.ResponseWriter, r *h
 
 	// Получаем всех животных в вольере
 	animalsInEnclosure := make([]model.Animal, 0)
-	for _, animalID := range enclosure.AnimalsIDs {
+	for _, animalID := range enclosure.AnimalsID {
 		animal, err := h.AnimalRepo.FindByID(animalID)
 		if err == nil && animal != nil {
 			animalsInEnclosure = append(animalsInEnclosure, *animal)

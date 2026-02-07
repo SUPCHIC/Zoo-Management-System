@@ -59,6 +59,8 @@ func (r *InMemoryAnimalRepository) Delete(id uuid.UUID) error {
 }
 
 func (r *InMemoryAnimalRepository) AnimalCount() int {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	count := len(r.animals)
 	return count
 }

@@ -1,8 +1,8 @@
 package model
 
 type Food struct {
-	FoodType FoodType
-	Name     string
+	FoodType FoodType `json:"foodType"`
+	Name     string   `json:"name"`
 }
 
 func NewFood(foodType FoodType, name string) *Food {
