@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"kpo-mini-dz2/domain/model"
-	"kpo-mini-dz2/infrastructure/repositories"
+	RP "kpo-mini-dz2/domain/repositoriesInterfaces"
 	"net/http"
 	"strconv"
 
@@ -12,18 +12,8 @@ import (
 )
 
 type ZooStatisticsHandler struct {
-	AnimalRepo    *repositories.InMemoryAnimalRepository
-	EnclosureRepo *repositories.InMemoryEnclosureRepository
-}
-
-func NewZooStatisticsHandler(
-	animalRepo *repositories.InMemoryAnimalRepository,
-	enclosureRepo *repositories.InMemoryEnclosureRepository,
-) *ZooStatisticsHandler {
-	return &ZooStatisticsHandler{
-		AnimalRepo:    animalRepo,
-		EnclosureRepo: enclosureRepo,
-	}
+	AnimalRepo    RP.IAnimalRepository
+	EnclosureRepo RP.IEnclosureRepository
 }
 
 func (h *ZooStatisticsHandler) GetAllAnimals(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +27,12 @@ func (h *ZooStatisticsHandler) GetAllAnimals(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(animals)
 }
 
+// GetAllEnclosures godoc
+// @Summary Получить все клетки
+// @Tags ZooStat
+// @Produce json
+// @Success 200 {object} model.Enclosure
+// @Router /api/zoostat/ [get]
 func (h *ZooStatisticsHandler) GetAllEnclosures(w http.ResponseWriter, r *http.Request) {
 	enclosures, err := h.EnclosureRepo.FindAll()
 	if err != nil {
@@ -48,6 +44,12 @@ func (h *ZooStatisticsHandler) GetAllEnclosures(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(enclosures)
 }
 
+// GetAnimalsBySpecies godoc
+// @Summary Получить всех животных по виду
+// @Tags ZooStat
+// @Produce json
+// @Success 200 {array} model.Animal
+// @Router /api/zoostat/{species} [get]
 func (h *ZooStatisticsHandler) GetAnimalsBySpecies(w http.ResponseWriter, r *http.Request) {
 	speciesName := chi.URLParam(r, "species")
 
@@ -68,6 +70,13 @@ func (h *ZooStatisticsHandler) GetAnimalsBySpecies(w http.ResponseWriter, r *htt
 	json.NewEncoder(w).Encode(filteredAnimals)
 }
 
+// GetEnclousersByType godoc
+// @Summary Get enclousers by type
+// @Description Get feeding schedule by ID
+// @Tags ZooStat
+// @Produce json
+// @Success 200 {array} model.Enclosure
+// @Router /api/zoostat/{type} [get]
 func (h *ZooStatisticsHandler) GetEnclosuresByType(w http.ResponseWriter, r *http.Request) {
 	typeParam := chi.URLParam(r, "type")
 	animalType := model.AnimalType(typeParam)
@@ -82,6 +91,12 @@ func (h *ZooStatisticsHandler) GetEnclosuresByType(w http.ResponseWriter, r *htt
 	json.NewEncoder(w).Encode(enclosures)
 }
 
+// GetEnclousersSpacely godoc
+// @Summary Get enclousers with free space
+// @Tags ZooStat
+// @Produce json
+// @Success 200 {array} model.Enclosure
+// @Router /api/zoostat/space [get]
 func (h *ZooStatisticsHandler) GetEnclosuresWithAvailableSpace(w http.ResponseWriter, r *http.Request) {
 	// Получаем параметр minSpace из query, если есть
 	minSpace := 1
@@ -102,8 +117,13 @@ func (h *ZooStatisticsHandler) GetEnclosuresWithAvailableSpace(w http.ResponseWr
 	json.NewEncoder(w).Encode(enclosures)
 }
 
-// Дополнительные методы, которые могут пригодиться
-
+// GetEnclousersByType godoc
+// @Summary Get enclousers by type
+// @Description Get feeding schedule by ID
+// @Tags ZooStat
+// @Produce json
+// @Success 200 {integer} int "Animal count"
+// @Router /api/zoostat/count [get]
 func (h *ZooStatisticsHandler) GetAnimalCount(w http.ResponseWriter, r *http.Request) {
 	count := h.AnimalRepo.AnimalCount()
 
@@ -115,6 +135,13 @@ func (h *ZooStatisticsHandler) GetAnimalCount(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(response)
 }
 
+// GetEnclousersByType godoc
+// @Summary Get enclousers by type
+// @Description Get feeding schedule by ID
+// @Tags ZooStat
+// @Produce json
+// @Success 200 {integer} int "Animal count"
+// @Router /api/zoostat/count [get]
 func (h *ZooStatisticsHandler) GetEnclosureByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -131,31 +158,4 @@ func (h *ZooStatisticsHandler) GetEnclosureByID(w http.ResponseWriter, r *http.R
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(enclosure)
-}
-
-func (h *ZooStatisticsHandler) GetAnimalsInEnclosure(w http.ResponseWriter, r *http.Request) {
-	idStr := chi.URLParam(r, "id")
-	enclosureID, err := uuid.Parse(idStr)
-	if err != nil {
-		http.Error(w, "Invalid ID format", http.StatusBadRequest)
-		return
-	}
-
-	enclosure, err := h.EnclosureRepo.FindByID(enclosureID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-
-	// Получаем всех животных в вольере
-	animalsInEnclosure := make([]model.Animal, 0)
-	for _, animalID := range enclosure.AnimalsID {
-		animal, err := h.AnimalRepo.FindByID(animalID)
-		if err == nil && animal != nil {
-			animalsInEnclosure = append(animalsInEnclosure, *animal)
-		}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(animalsInEnclosure)
 }

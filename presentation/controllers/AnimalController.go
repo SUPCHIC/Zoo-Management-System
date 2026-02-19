@@ -21,7 +21,7 @@ type AnimalHandler struct {
 // @Produce json
 // @Param animal body model.Animal true "Animal Data"
 // @Success 201 {object} model.Animal
-// @Router /animals [post]
+// @Router /api/animals [post]
 func (h *AnimalHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var newAnimal model.Animal
 
@@ -43,7 +43,7 @@ func (h *AnimalHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Tags animals
 // @Produce json
 // @Success 200 {array} model.Animal
-// @Router /animals [get]
+// @Router /api/animals [get]
 func (h *AnimalHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	animals, err := h.Repo.FindAll()
 	if err != nil {
@@ -61,7 +61,7 @@ func (h *AnimalHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path string true "Animal ID"
 // @Success 200 {object} model.Animal
-// @Router /animals/{id} [get]
+// @Router /api/animals/{id} [get]
 func (h *AnimalHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -85,7 +85,7 @@ func (h *AnimalHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Tags animals
 // @Param id path string true "Animal ID"
 // @Success 204
-// @Router /animals/{id} [delete]
+// @Router /api/animals/{id} [delete]
 func (h *AnimalHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)

@@ -9,9 +9,15 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
+        "termsOfService": "https://example.com/terms/",
         "contact": {
             "name": "API Support",
-            "url": "http://example.com/support"
+            "url": "https://example.com/support",
+            "email": "support@example.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
         },
         "version": "{{.Version}}"
     },
@@ -19,6 +25,28 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/animals": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ZooStat"
+                ],
+                "summary": "Получить всех животных по виду",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Animal"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/animals": {
             "get": {
                 "produces": [
                     "application/json"
@@ -71,7 +99,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/animals/{id}": {
+        "/api/animals/{id}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -118,12 +146,166 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/schedules": {
+            "get": {
+                "description": "Get feeding schedule by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "feeding_schedule"
+                ],
+                "summary": "Get feeding schedule by ID",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedingSchedule"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Adds a new feeding schedule for an animal with specified feeding time and food type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "feeding_schedule"
+                ],
+                "summary": "Add a new feeding schedule",
+                "parameters": [
+                    {
+                        "description": "Feeding schedule information",
+                        "name": "schedule",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.AddScheduleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete schedule by animalID and time from repository",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "feeding_schedule"
+                ],
+                "summary": "Delete feeding schedule",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/zoostat/": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ZooStat"
+                ],
+                "summary": "Получить все клетки",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Enclosure"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "controllers.AddScheduleRequest": {
+            "type": "object",
+            "properties": {
+                "animalId": {
+                    "type": "string"
+                },
+                "feedingTime": {
+                    "type": "string"
+                },
+                "foodType": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Animal": {
             "type": "object",
             "properties": {
+                "ID": {
+                    "type": "string"
+                },
                 "birthDate": {
                     "type": "string"
                 },
@@ -139,14 +321,51 @@ const docTemplate = `{
                 "healthStatus": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string"
                 },
                 "species": {
                     "$ref": "#/definitions/model.Species"
+                }
+            }
+        },
+        "model.Enclosure": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
+                "animalsID": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "currentCount": {
+                    "type": "integer"
+                },
+                "maxCapacity": {
+                    "type": "integer"
+                },
+                "size": {
+                    "$ref": "#/definitions/model.Size"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.FeedingSchedule": {
+            "type": "object",
+            "properties": {
+                "animalID": {
+                    "type": "string"
+                },
+                "feedingTime": {
+                    "type": "string"
+                },
+                "foodType": {
+                    "type": "string"
                 }
             }
         },
@@ -172,6 +391,20 @@ const docTemplate = `{
                 "Female"
             ]
         },
+        "model.Size": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer"
+                },
+                "lenght": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Species": {
             "type": "object",
             "properties": {
@@ -183,24 +416,17 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "securityDefinitions": {
-        "BearerAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
-        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:3000",
-	BasePath:         "/api",
+	Host:             "localhost:8080",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "Animal Service API",
-	Description:      "Это сервер для управления животными в зоопарке.",
+	Title:            "My Chi API",
+	Description:      "This is a sample server for my API using Chi",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

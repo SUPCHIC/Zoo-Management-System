@@ -1,7 +1,18 @@
-basePath: /api
+basePath: /api/v1
 definitions:
+  controllers.AddScheduleRequest:
+    properties:
+      animalId:
+        type: string
+      feedingTime:
+        type: string
+      foodType:
+        type: string
+    type: object
   model.Animal:
     properties:
+      ID:
+        type: string
       birthDate:
         type: string
       enclosureID:
@@ -12,12 +23,36 @@ definitions:
         $ref: '#/definitions/model.Gender'
       healthStatus:
         type: string
-      id:
-        type: string
       name:
         type: string
       species:
         $ref: '#/definitions/model.Species'
+    type: object
+  model.Enclosure:
+    properties:
+      ID:
+        type: string
+      animalsID:
+        items:
+          type: string
+        type: array
+      currentCount:
+        type: integer
+      maxCapacity:
+        type: integer
+      size:
+        $ref: '#/definitions/model.Size'
+      type:
+        type: string
+    type: object
+  model.FeedingSchedule:
+    properties:
+      animalID:
+        type: string
+      feedingTime:
+        type: string
+      foodType:
+        type: string
     type: object
   model.Food:
     properties:
@@ -34,6 +69,15 @@ definitions:
     x-enum-varnames:
     - Male
     - Female
+  model.Size:
+    properties:
+      height:
+        type: integer
+      lenght:
+        type: integer
+      width:
+        type: integer
+    type: object
   model.Species:
     properties:
       animalType:
@@ -41,16 +85,35 @@ definitions:
       name:
         type: string
     type: object
-host: localhost:3000
+host: localhost:8080
 info:
   contact:
+    email: support@example.com
     name: API Support
-    url: http://example.com/support
-  description: Это сервер для управления животными в зоопарке.
-  title: Animal Service API
+    url: https://example.com/support
+  description: This is a sample server for my API using Chi
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://example.com/terms/
+  title: My Chi API
   version: "1.0"
 paths:
   /animals:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Animal'
+            type: array
+      summary: Получить всех животных по виду
+      tags:
+      - ZooStat
+  /api/animals:
     get:
       produces:
       - application/json
@@ -84,7 +147,7 @@ paths:
       summary: Добавить животное
       tags:
       - animals
-  /animals/{id}:
+  /api/animals/{id}:
     delete:
       parameters:
       - description: Animal ID
@@ -115,9 +178,95 @@ paths:
       summary: Получить животное по ID
       tags:
       - animals
-securityDefinitions:
-  BearerAuth:
-    in: header
-    name: Authorization
-    type: apiKey
+  /api/schedules:
+    delete:
+      consumes:
+      - application/json
+      description: Delete schedule by animalID and time from repository
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete feeding schedule
+      tags:
+      - feeding_schedule
+    get:
+      consumes:
+      - application/json
+      description: Get feeding schedule by ID
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.FeedingSchedule'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get feeding schedule by ID
+      tags:
+      - feeding_schedule
+    post:
+      consumes:
+      - application/json
+      description: Adds a new feeding schedule for an animal with specified feeding
+        time and food type
+      parameters:
+      - description: Feeding schedule information
+        in: body
+        name: schedule
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.AddScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Add a new feeding schedule
+      tags:
+      - feeding_schedule
+  /zoostat/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Enclosure'
+      summary: Получить все клетки
+      tags:
+      - ZooStat
 swagger: "2.0"
